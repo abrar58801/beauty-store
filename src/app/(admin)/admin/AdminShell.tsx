@@ -40,7 +40,11 @@ export default function AdminShell({
         {
             name: "Reports",
             href: "/admin/reports",
-        }
+        },
+        {
+            name: "Gallery",
+            href: "/admin/gallery",
+        },
     ];
 
     return (

@@ -94,6 +94,7 @@ export default function Navbar() {
           <Link href="/collections">Collections</Link>
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
+          <Link href="/gallery">Gallery</Link>
         </nav>
 
         {/* RIGHT */}
@@ -209,6 +210,7 @@ export default function Navbar() {
           <Link href="/collections" className="block">Collections</Link>
           <Link href="/about" className="block">About</Link>
           <Link href="/contact" className="block">Contact</Link>
+          <Link href="/gallery" className="block">Gallery</Link>
         </div>
       )}
     </header>
