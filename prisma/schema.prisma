@@ -1,0 +1,277 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String     @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  role          Role       @default(USER)
+  isBlocked     Boolean    @default(false)
+
+  accounts      Account[]
+  sessions      Session[]
+  cartItems     Cart[]
+  wishlistItems Wishlist[]
+  orders        Order[]
+  reviews       Review[]
+  addresses     Address[]
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  image     String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Brand {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  logo      String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id               String  @id @default(cuid())
+  name             String
+  slug             String  @unique
+  description      String?
+  shortDescription String?
+  price            Float
+  comparePrice     Float?
+  sku              String?
+  stock            Int
+  featured         Boolean @default(false)
+  active           Boolean @default(true)
+
+  categoryId String
+  brandId    String
+
+  category Category @relation(fields: [categoryId], references: [id])
+  brand    Brand    @relation(fields: [brandId], references: [id])
+
+  images   ProductImage[]
+  variants ProductVariant[]
+
+  cartItems     Cart[]
+  wishlistItems Wishlist[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductImage {
+  id  String @id @default(cuid())
+  url String
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductVariant {
+  id    String @id @default(cuid())
+  name  String
+  value String
+  price Float
+  stock Int
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String @id @default(cuid())
+  quantity  Int    @default(1)
+  userId    String
+  productId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Wishlist {
+  id        String @id @default(cuid())
+  userId    String
+  productId String
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id     String      @id @default(cuid())
+  userId String
+  total  Float
+  status OrderStatus @default(PENDING)
+
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Address {
+  id       String @id @default(cuid())
+  userId   String
+  fullName String
+  phone    String
+  address  String
+  city     String
+  state    String
+  country  String
+  zipCode  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id        String @id @default(cuid())
+  rating    Int
+  comment   String @db.Text
+  userId    String
+  productId String
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  id                String   @id @default(cuid())
+
+  siteName          String?
+  siteDescription   String?  @db.Text
+
+  logo              String?
+  favicon           String?
+
+  heroBanner        String?
+  heroTitle         String?
+  heroSubtitle      String?
+  heroButtonText    String?
+  heroButtonLink    String?
+
+  seoTitle          String?
+  seoDescription    String? @db.Text
+  seoKeywords       String?
+
+  contactEmail      String?
+  contactPhone      String?
+  contactAddress    String?
+  businessHours     String?
+
+  facebook          String?
+  instagram         String?
+  twitter           String?
+  youtube           String?
+  whatsapp          String?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
