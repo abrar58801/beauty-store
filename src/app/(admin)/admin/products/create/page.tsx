@@ -10,7 +10,14 @@ export default function ProductsPage() {
 
   const [images, setImages] = useState<string[]>([]);
 
-  const [variants, setVariants] = useState([
+  type Variant = {
+    name: string;
+    value: string;
+    price: string;
+    stock: string;
+  };
+
+  const [variants, setVariants] = useState<Variant[]>([
     {
       name: "",
       value: "",
@@ -78,7 +85,7 @@ export default function ProductsPage() {
 
   const updateVariant = (
     index: number,
-    field: string,
+    field: keyof Variant,
     value: string
   ) => {
     const updated = [...variants];
