@@ -3,6 +3,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const { status } = useSession();
@@ -34,9 +35,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center bg-pink-50 px-4">
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl">
-        <h1 className="text-3xl font-bold mb-6">Login</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          Login
+        </h1>
 
         <input
           className="w-full border p-4 rounded-xl mb-4"
@@ -53,10 +56,20 @@ export default function LoginPage() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-black text-white py-4 rounded-xl"
+          className="w-full bg-black text-white py-4 rounded-xl hover:bg-gray-800 transition"
         >
           Login
         </button>
+
+        <p className="text-center mt-6 text-gray-600">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/signup"
+            className="text-pink-500 font-semibold hover:underline"
+          >
+            Sign Up
+          </Link>
+        </p>
       </div>
     </div>
   );
