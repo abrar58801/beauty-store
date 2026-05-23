@@ -1,4 +1,7 @@
 import nodemailer from "nodemailer";
+const SITE_URL =
+  process.env.NEXTAUTH_URL ||
+  "http://localhost:3000";
 
 export const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -18,12 +21,43 @@ export async function sendWelcomeEmail(email: string) {
     html: `
       <div style="font-family:Arial;padding:40px;background:#fff8fb;">
         <div style="max-width:600px;margin:auto;background:white;padding:40px;border-radius:20px;">
-          <h1>Welcome to Beauty Luxe 💖</h1>
-          <p>Thank you for subscribing to our newsletter.</p>
-          <a href="http://localhost:3000"
-             style="display:inline-block;padding:14px 28px;background:black;color:white;text-decoration:none;border-radius:999px;">
-             Shop Now
+          <h1 style="color:#111;font-size:32px;">
+            Welcome to Beauty Luxe 💖
+          </h1>
+
+          <p style="color:#666;font-size:16px;line-height:1.8;">
+            Thank you for subscribing to our newsletter.
+          </p>
+
+          <p style="color:#666;font-size:16px;line-height:1.8;">
+            You'll be the first to receive:
+          </p>
+
+          <ul style="color:#666;font-size:16px;line-height:2;">
+            <li>Exclusive offers</li>
+            <li>New product launches</li>
+            <li>Beauty tips & updates</li>
+            <li>Special discounts</li>
+          </ul>
+
+          <a
+            href="${SITE_URL}"
+            style="
+              display:inline-block;
+              padding:14px 28px;
+              background:black;
+              color:white;
+              text-decoration:none;
+              border-radius:999px;
+              margin-top:20px;
+            "
+          >
+            Shop Now
           </a>
+
+          <p style="margin-top:40px;color:#999;">
+            — Beauty Luxe Team
+          </p>
         </div>
       </div>
     `,
