@@ -43,41 +43,103 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: {
+    params: Promise<{ id: string }>;
+  }
 ) {
   try {
+    const admin = await isAdmin();
+
+    if (!admin) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const { id } = await context.params;
     const body = await req.json();
 
-    console.log("PATCH BODY:", body);
-    console.log("PATCH IMAGES:", body.images);
+    const {
+      name,
+      slug,
+      description,
+      shortDescription,
+      price,
+      comparePrice,
+      sku,
+      stock,
+      featured,
+      active,
+      categoryId,
+      brandId,
+      images,
+      variants,
+    } = body;
 
+    await prisma.product.update({
+      where: { id },
+      data: {
+        name,
+        slug,
+        description,
+        shortDescription,
+        price,
+        comparePrice,
+        sku,
+        stock,
+        featured,
+        active,
+        categoryId,
+        brandId,
+      },
+    });
+
+    // Replace images
     await prisma.productImage.deleteMany({
       where: {
         productId: id,
       },
     });
 
-    if (body.images?.length) {
-      for (const img of body.images) {
-        console.log("INSERTING:", img);
+    if (images?.length) {
+      await prisma.productImage.createMany({
+        data: images.map((img: string) => ({
+          productId: id,
+          url: img,
+        })),
+      });
+    }
 
-        await prisma.productImage.create({
-          data: {
+    // Replace variants
+    await prisma.productVariant.deleteMany({
+      where: {
+        productId: id,
+      },
+    });
+
+    if (variants?.length) {
+      await prisma.productVariant.createMany({
+        data: variants.map(
+          (variant: any) => ({
             productId: id,
-            url: img,
-          },
-        });
-      }
+            name: variant.name,
+            value: variant.value,
+            price: variant.price,
+            stock: variant.stock,
+          })
+        ),
+      });
     }
 
     return NextResponse.json({
       success: true,
     });
   } catch (err) {
-    console.error("PATCH ERROR:", err);
+    console.error(err);
+
     return NextResponse.json(
-      { error: "failed" },
+      { error: "Update failed" },
       { status: 500 }
     );
   }
