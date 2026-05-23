@@ -61,46 +61,110 @@ export default function ProductDetails({
   return (
     <>
       <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-16">
-        <div>
-  <div className="relative bg-pink-50 rounded-3xl p-8">
-    {/* TOP THUMBNAILS */}
-    {product.images.length > 1 && (
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex gap-3 bg-white/80 backdrop-blur-md px-4 py-3 rounded-2xl shadow-lg">
+        <div className="w-full">
+  {/* MAIN IMAGE */}
+  <div className="bg-white rounded-2xl md:rounded-3xl p-4 md:p-6 shadow">
+    {product.images.length > 0 ? (
+      <img
+        src={product.images[activeImage]?.url}
+        alt={product.name}
+        onClick={() => setPreviewOpen(true)}
+        className="w-full h-[320px] sm:h-[450px] md:h-[600px] object-contain rounded-2xl cursor-zoom-in"
+      />
+    ) : (
+      <div className="h-[320px] md:h-[600px] flex items-center justify-center">
+        No Image
+      </div>
+    )}
+  </div>
+
+  {/* RESPONSIVE THUMB SLIDER */}
+  {product.images.length > 1 && (
+  <div className="flex items-center gap-2 md:gap-4 mt-4 md:mt-6 w-full">
+    {/* LEFT */}
+    <button
+      onClick={() => {
+        const newIndex =
+          activeImage === 0
+            ? product.images.length - 1
+            : activeImage - 1;
+
+        setActiveImage(newIndex);
+
+        document
+          .getElementById(`thumb-${newIndex}`)
+          ?.scrollIntoView({
+            behavior: "smooth",
+            inline: "center",
+            block: "nearest",
+          });
+      }}
+      className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 rounded-full border bg-white shadow flex items-center justify-center text-xl"
+    >
+      ‹
+    </button>
+
+    {/* THUMB CONTAINER */}
+    <div className="flex-1 overflow-hidden">
+      <div className="flex gap-2 md:gap-4 overflow-x-auto no-scrollbar px-1">
         {product.images.map(
           (image: any, index: number) => (
-            <img
+            <button
+              id={`thumb-${index}`}
               key={index}
-              src={image.url}
-              onClick={() =>
-                setActiveImage(index)
-              }
-              className={`w-16 h-16 object-cover rounded-xl cursor-pointer border-2 transition ${
+              onClick={() => {
+                setActiveImage(index);
+
+                document
+                  .getElementById(`thumb-${index}`)
+                  ?.scrollIntoView({
+                    behavior: "smooth",
+                    inline: "center",
+                    block: "nearest",
+                  });
+              }}
+              className={`flex-shrink-0 rounded-xl md:rounded-2xl p-1 md:p-2 border-2 bg-white transition ${
                 activeImage === index
-                  ? "border-black scale-105"
-                  : "border-transparent"
+                  ? "border-black shadow-lg"
+                  : "border-gray-200"
               }`}
-            />
+            >
+              <img
+                src={image.url}
+                alt=""
+                className="w-14 h-14 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-lg md:rounded-xl"
+              />
+            </button>
           )
         )}
       </div>
-    )}
+    </div>
 
-    {/* MAIN IMAGE */}
-    {product.images.length > 0 ? (
-      <img
-        src={
-          product.images[activeImage]?.url
-        }
-        alt={product.name}
-        onClick={() =>
-          setPreviewOpen(true)
-        }
-        className="rounded-2xl w-full h-[550px] object-cover cursor-zoom-in"
-      />
-    ) : (
-      <div>No Image</div>
-    )}
+    {/* RIGHT */}
+    <button
+      onClick={() => {
+        const newIndex =
+          activeImage ===
+          product.images.length - 1
+            ? 0
+            : activeImage + 1;
+
+        setActiveImage(newIndex);
+
+        document
+          .getElementById(`thumb-${newIndex}`)
+          ?.scrollIntoView({
+            behavior: "smooth",
+            inline: "center",
+            block: "nearest",
+          });
+      }}
+      className="w-10 h-10 md:w-12 md:h-12 flex-shrink-0 rounded-full border bg-white shadow flex items-center justify-center text-xl"
+    >
+      ›
+    </button>
   </div>
+)}
 </div>
 
         {/* DETAILS */}
